@@ -1,6 +1,7 @@
 package handlers
 
 import (
+    "fmt"
 	"io"
 	"net/http"
 	"os"
@@ -57,7 +58,11 @@ func Upload(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	name := time.Now().UTC().Format("20060102T150405.000000000Z") + filepath.Ext(header.Filename)
+	name := fmt.Sprintf("%s%09d%s",
+	    time.Now().Format("20060102T150405"),
+	    time.Now().Nanosecond(),
+	    filepath.Ext(header.Filename),
+    )
 	output, err := os.OpenFile(filepath.Join(OutputDir, name), os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0644)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
